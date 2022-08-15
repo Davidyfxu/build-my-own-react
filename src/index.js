@@ -8,8 +8,8 @@ function createElement(type, props, ...children) {
       ...props,
       children: children.map((child) =>
         typeof child === "object" ? child : createTextElement(child)
-      ),
-    },
+      )
+    }
   };
 }
 function createTextElement(text) {
@@ -38,7 +38,8 @@ const element = Didact.createElement(
   "div",
   { id: "foo" },
   Didact.createElement("a", null, "bar"),
-  Didact.createElement("b")
+  Didact.createElement("b"),
+  Didact.createElement("br")
 );
 
 const container = document.getElementById("root");
