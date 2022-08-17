@@ -88,11 +88,60 @@ function render(element, container) {
 
 ## Concurrent Mode
 
+**并发模式**：上一节中，我们采用递归的方式来渲染，但万一由于递归太深中途渲染中断，则浏览器会被迫终止，因此我们需要划分小单元。假如某个单元需要被停止，我们就应该让浏览器停止这个小单元。
 
+**requestIdleCallback**：写一个loop作为延时器，当主线程空闲的时候浏览器调用callback（React不再使用此方法，而是使用scheduler调度，但原理一致）。requestIdleCallback需要一个deadline参数，用来得知浏览器再次控制的时间还有多久。
+
+**performUnitOfWork**：实现工作，并返回下一个工作单元。
+
+```jsx
+let nextUnitOfWork = null;
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+  requestIdleCallback(workLoop);
+}
+requestIdleCallback(workLoop);
+function performUnitOfWork(nextUnitOfWork) {
+  // TODO
+}
+```
 
 ## Fibers
 
+Fiber树：工作单元的数据结构
 
+![img](https://cdn.nlark.com/yuque/0/2022/png/26911683/1660711952926-fac8a007-5ce6-4fbe-a0b4-58c7b8e9310a.png)
+
+在`render`阶段，假设我们形成了element tree，如下。
+
+```jsx
+Didact.render(
+  <div>
+    <h1>
+      <p />
+      <a />
+    </h1>
+    <h2 />
+  </div>,
+  container
+)
+```
+
+在`Didact.render`中，将创建Root Fiber并把它设为`nextUnitOfWork`，然后剩下的工作便是`performUnitOfWork`函数。
+
+对于每个Fiber：
+
+1. 把element加入DOM。
+2. 为每个element子节点创建Fiber。
+3. 挑选下一个合适的工作单元。
+
+对于上图，root先寻找child，接着div->h1->p->a->h1->h2->div->root，工作结束
+
+开始改造render，形成createDom的方法，保留原本dom的生成方法。
 
 ## Render and Commit Phases
 
