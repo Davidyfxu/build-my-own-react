@@ -145,7 +145,28 @@ Didact.render(
 
 ## Render and Commit Phases
 
+遇到了另一个问题，每次我们处理一个element然后加一个新节点到DOM中，但浏览器可能在我们结束渲染整棵树前终止，这就有可能导致不完整UI，给用户带来歧义。因此，我们需要删去部分可变DOM。
 
+为了实现这个优化，我们需要追踪fiber树的根节点，用`wipRoot`来描述。一旦完成了整棵树render，我们才会commit整棵树到DOM。
+
+`commitRoot`: 递归添加节点到dom。(中序遍历)
+
+```jsx
+function commitWork(fiber) {
+  if (fiber) {
+    const domParent = fiber.parent.dom;
+    domParent.appendChild(fiber.dom);
+    commitWork(fiber.child);
+    commitWork(fiber.sibling);
+  }
+}
+
+function commitRoot() {
+  // add nodes to dom
+  commitWork(wipRoot.child);
+  wipRoot = null;
+}
+```
 
 ## Reconciliation
 
