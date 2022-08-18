@@ -170,7 +170,11 @@ function commitRoot() {
 
 ## Reconciliation
 
+用协调器来做更新或删除节点的操作。为了update或delete，我们需要将最新的render的fiber tree和committed的fiber tree做diff。
 
+因此，我们需要在commit结束后，保留上次committed的fiber tree的指针，同时加一个`alternate`属性给每一个fiber，这个属性连接着旧的fiber（committed fiber），方便之后做diff。
+
+提取`performUnitOfWork`函数到`reconcileChildren`函数，用于协调新老fibers的diff。
 
 ## Function Components
 
