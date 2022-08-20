@@ -205,3 +205,5 @@ function commitRoot() {
 
 
 ## Hooks
+
+`Didact.useState` 用数组代替链表
