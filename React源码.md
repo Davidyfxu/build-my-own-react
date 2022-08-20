@@ -176,7 +176,31 @@ function commitRoot() {
 
 提取`performUnitOfWork`函数到`reconcileChildren`函数，用于协调新老fibers的diff。
 
+`reconcileChildren`函数：同时迭代老fiber的Children和新调度的elements，忽略两者的数据结构，`element`是将渲染到DOM的内容，`oldFiber`是上次渲染到DOM的内容。
+
+`React Diff`原则：
+
+1. 老Fiber和新element有同样的type -> 保持原DOM，更新props
+   基于老Fiber的DOM和新element的props创建新Fiber，同时加一个新属性`effectTag`（设为UPDATE）到fiber之后commit阶段使用。
+2. 有不同的type且element为全新的 -> 新建DOM
+   `effectTag` 设置为PLACEMENT。
+3. 有不同的type且有老Fiber -> 删除DOM
+   把effectTag加入老Fiber设为DELETION，需要加一个deletions的array来记录需要删除的fiber，当Commit所有改变到DOM时，我们从array中提取fiber做删除。
+
+> 注意：React也使用keys促进协调器的Diff加速。
+
+对`commitWork`函数做effectTag识别处理，对不同effectTag分别做增删改操作。
+
 ## Function Components
+
+函数组件不同点：
+
+1. 函数组件的fiber没有DOM
+2. children来自于函数，而不是props
+
+在`performUnitOfWork`中加一个判断函数组件的函数，用`updateFunctionComponent`函数来做额外处理。
+
+因为函数组件fiber没有DOM，所以需要1. 找到fiber.parent的DOM，2. 删除节点的时候，我们需要去找到带DOM节点的child将其删除。
 
 
 
