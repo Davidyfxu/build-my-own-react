@@ -29,7 +29,7 @@ function updateDom(dom, prevProps, nextProps) {
   // Remove old properties or changed event listeners
   Object.keys(prevProps)
     .filter(isEvent)
-    .filter((key) => !(key in nextProps) || isNew(prevProps, nextProps)[key])
+    .filter((key) => !(key in nextProps) || isNew(prevProps, nextProps)(key))
     .forEach((name) => {
       const eventType = name.toLowerCase().substring(2);
       dom.removeEventListener(eventType, prevProps[name]);
@@ -42,7 +42,6 @@ function updateDom(dom, prevProps, nextProps) {
       dom[name] = "";
     });
   // Set new or changed properties
-  console.log(nextProps);
   Object.keys(nextProps)
     .filter(isProperty)
     .filter(isNew(prevProps, nextProps))
@@ -149,8 +148,8 @@ function reconcileChildren(wipFiber, elements) {
   let index = 0;
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
   let prevSibling = null;
-
-  while (index < elements.length || oldFiber !== null) {
+  console.log("oldFiber", oldFiber);
+  while (index < elements.length || oldFiber != null) {
     const element = elements[index];
     let newFiber = null;
     // Compare oldFiber to element
