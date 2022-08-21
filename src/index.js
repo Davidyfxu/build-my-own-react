@@ -148,7 +148,6 @@ function reconcileChildren(wipFiber, elements) {
   let index = 0;
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
   let prevSibling = null;
-  console.log("oldFiber", oldFiber);
   while (index < elements.length || oldFiber != null) {
     const element = elements[index];
     let newFiber = null;
